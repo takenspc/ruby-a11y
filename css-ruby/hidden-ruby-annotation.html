@@ -38,10 +38,10 @@ other than to separate adjacent sequences of <i>ruby annotation boxes</i> within
 as if they belonged to separate segments
 and the <i>hidden annotation</i>’s base were not a <i>ruby base</i> but an intervening inline.
 <mark>A hidden annotation does not have an associated CSS layout box [<a href="https://drafts.csswg.org/cssom-view/#css-layout-box">CSSOM View Module</a>].</mark><p>
-<p><mark>NOTE: Not having an associated CSS layout box results a hidden annotation never receive the focus [<a href="https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps">HTML</a>].</mark></p>
+<p><mark>NOTE: Not having an associated CSS layout box means a hidden annotation never receive the focus [<a href="https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps">HTML</a>].</mark></p>
 </div>
 <h2>Why?</h2>
-<p>The users (especially sighted and keyboard users) may confuse if
+<p>The users (especially sighted keyboard-only users) may confuse if
 <ul>
 <li>a ruby annotation is hidden,</li>
 <li>the ruby annotation contains <a href="https://html.spec.whatwg.org/multipage/dom.html#interactive-content-2">interactive contents</a>, and
