@@ -9,8 +9,8 @@
 <h1>[CSS Ruby] Proposal to make "hidden" ruby annotation not have an associated CSS layout box</h1>
 <h2>Proposal</h2>
 <p>I propose that making hidden ruby annotation (<a href="https://drafts.csswg.org/css-ruby-1/#autohide">CSS Ruby Layout Module Level 1 § 2.4. Autohiding Base-identical Annotations</a>) not have an associated CSS layout box.
-This change will make hidden ruby annotation not receive the focus.
-Because HTML Standard states that elements which doesn't have CSS layout boxes will never receive the focus (see <a href="https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps">HTML Standard 6.4.4 Processing model</a>).</p>
+This change will make hidden ruby annotation not gain the focus.
+Because HTML Standard states that elements which doesn't have CSS layout boxes will never gain the focus (see <a href="https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps">HTML Standard 6.4.4 Processing model</a>).</p>
 <h3>Current definition</h3>
 <p><a href="https://drafts.csswg.org/css-ruby-1/#autohide">CSS Ruby Layout Module Level 1 § 2.4. Autohiding Base-identical Annotations</a></p>
 <blockquote class="definition">
@@ -38,9 +38,9 @@ other than to separate adjacent sequences of <i>ruby annotation boxes</i> within
 as if they belonged to separate segments
 and the <i>hidden annotation</i>’s base were not a <i>ruby base</i> but an intervening inline.
 <mark>A hidden annotation does not have an associated CSS layout box [<a href="https://drafts.csswg.org/cssom-view/#css-layout-box">CSSOM View Module</a>].</mark><p>
-<p><mark>NOTE: Not having an associated CSS layout box means a hidden annotation never receive the focus [<a href="https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps">HTML</a>].</mark></p>
+<p><mark>NOTE: This will make the hidden ruby annotation not being rendered, hence it will not gain focus [<a href="https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps">HTML</a>].</mark></p>
 </div>
-<h2>Why?</h2>
+<h2>Rationale</h2>
 <p>The users (especially sighted keyboard-only users) may confuse if
 <ul>
 <li>a ruby annotation is hidden,</li>
