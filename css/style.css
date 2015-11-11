@@ -1,0 +1,19 @@
+body {
+	margin: 0 2rem;
+	background-color: #fff;
+	color: #333;
+}
+
+.definition {
+	margin-left: 4rem;
+	margin-right: 1rem;
+}
+
+pre {
+	white-space: pre-line;
+}
+
+.example {
+	background-color: #ccc;
+	padding: .5rem 1rem;
+}
