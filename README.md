@@ -2,4 +2,4 @@
 
 ## CSS Ruby
 
-- [Proposal to clarify "hidden" ruby annotation does not have an associated CSS layout box](css-ruby/hidden-ruby-annotation.html)
+- [Proposal to make "hidden" ruby annotation not have an associated CSS layout box](css-ruby/hidden-ruby-annotation.html)

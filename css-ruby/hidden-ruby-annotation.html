@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>[CSS Ruby] Proposal to clarify "hidden" ruby annotation does not have an associated CSS layout box</title>
+<title>[CSS Ruby] Proposal to make "hidden" ruby annotation not have an associated CSS layout box</title>
 <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<h1>[CSS Ruby] Proposal to clarify "hidden" ruby annotation does not have an associated CSS layout box</h1>
+<h1>[CSS Ruby] Proposal to make "hidden" ruby annotation not have an associated CSS layout box</h1>
 <h2>Proposal</h2>
-<p>I propose to clarify that hidden ruby annotation (<a href="https://drafts.csswg.org/css-ruby-1/#autohide">CSS Ruby Layout Module Level 1 § 2.4. Autohiding Base-identical Annotations</a>) does not have an associated CSS layout box. This change will make hidden ruby annotation not receive the focus as HTML Standard states that elements which doesn't have CSS layout boxes will never receive the focus (<a href="https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps">HTML Standard 6.4.4 Processing model</a>).</p>
+<p>I propose that making hidden ruby annotation (<a href="https://drafts.csswg.org/css-ruby-1/#autohide">CSS Ruby Layout Module Level 1 § 2.4. Autohiding Base-identical Annotations</a>) not have an associated CSS layout box.
+This change will make hidden ruby annotation not receive the focus.
+Because HTML Standard states that elements which doesn't have CSS layout boxes will never receive the focus (see <a href="https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps">HTML Standard 6.4.4 Processing model</a>).</p>
 <h3>Current definition</h3>
 <p><a href="https://drafts.csswg.org/css-ruby-1/#autohide">CSS Ruby Layout Module Level 1 § 2.4. Autohiding Base-identical Annotations</a></p>
 <blockquote class="definition">
@@ -38,8 +40,8 @@ and the <i>hidden annotation</i>’s base were not a <i>ruby base</i> but an int
 <mark>A hidden annotation does not have an associated CSS layout box [<a href="https://drafts.csswg.org/cssom-view/#css-layout-box">CSSOM View Module</a>].</mark><p>
 <p><mark>NOTE: Not having an associated CSS layout box results a hidden annotation never receive the focus [<a href="https://html.spec.whatwg.org/multipage/interaction.html#focusing-steps">HTML</a>].</mark></p>
 </div>
-<h2>Why</h2>
-<p>The users (especially sighted and keyboard only users) may confuse if
+<h2>Why?</h2>
+<p>The users (especially sighted and keyboard users) may confuse if
 <ul>
 <li>a ruby annotation is hidden,</li>
 <li>the ruby annotation contains <a href="https://html.spec.whatwg.org/multipage/dom.html#interactive-content-2">interactive contents</a>, and
@@ -47,7 +49,7 @@ and the <i>hidden annotation</i>’s base were not a <i>ruby base</i> but an int
 </ul>
 <p>Because the focus will be moved to an invisible interactive element by pressing <kbd>Tab</kbd> key.</p>
 <h3>Example</h3>
-<p>Consider a following example (borrowed from <a href="https://hacks.mozilla.org/2015/03/ruby-support-in-firefox-developer-edition-38/">Mozilla Hacks</a>):</p>
+<p>Consider a following example: (the example is borrowed from <a href="https://hacks.mozilla.org/2015/03/ruby-support-in-firefox-developer-edition-38/">Mozilla Hacks</a>)</p>
 <pre class="example"><code>&lt;ruby&gt;
     &lt;rb&gt;とある&lt;/rb&gt;&lt;rb&gt;科学&lt;/rb&gt;&lt;rb&gt;の&lt;/rb&gt;&lt;rb&gt;超電磁砲&lt;/rb&gt;
     &lt;rp&gt;（&lt;/rp&gt;
@@ -63,7 +65,7 @@ and the <i>hidden annotation</i>’s base were not a <i>ruby base</i> but an int
 </ruby>
 </div>
 <p>There are 4 ruby bases and 4 ruby annotations. First and third ruby annotations (<span lang="ja">とある</span> and <span lang="ja">の</span>) are hidden because they are identical as their ruby bases.
-<p>Now let's consider a following example. In this example, each ruby annotation contains a link.</p>
+<p>Now, let's consider a following example. Each ruby annotation contains a link in this example.</p>
 <pre class="example"><code>&lt;ruby&gt;
     &lt;rb&gt;とある&lt;/rb&gt;&lt;rb&gt;科学&lt;/rb&gt;&lt;rb&gt;の&lt;/rb&gt;&lt;rb&gt;超電磁砲&lt;/rb&gt;
     &lt;rp&gt;（&lt;/rp&gt;
@@ -78,11 +80,11 @@ and the <i>hidden annotation</i>’s base were not a <i>ruby base</i> but an int
 	<rp>）</rp>
 </ruby>
 </div>
-<p>First and third links (<span lang="ja">とある</span> and <span lang="ja">の</span>) are hidden because ruby annotations is hidden. It will be unnatural and confusing if invisible links are focusable.</p>
+<p>First and third links (<span lang="ja">とある</span> and <span lang="ja">の</span>) are hidden because ruby annotations is hidden. It will be confusing if invisible links are focusable.</p>
 <h2>Current Implementations</h2>
 <p>Mozilla Firefox moves the focus into hidden ruby annotations.</p>
 <hr>
 <h2>Navigation</h2>
-<p>return to <a href="../">Misc. Thoughts on Ruby</a>.</p>
+<p>Return to <a href="../">Misc. Thoughts on Ruby</a>.</p>
 </body>
 </html>
