@@ -12,7 +12,7 @@ The fallback contents of a canvas element can be associated with the regions of 
 
 Is it possible to associate hidden ruby text with ruby base?
 
-How do browsers handle `<ruby>foo bar baz<rt>foo <a href="#">bar</a> baz</ruby>`?
+How should browsers handle `<ruby><a href="#">foo</a> bar baz<rt>foo <a href="#">bar</a> baz</ruby>`?
 
 Should hidden ruby annotation be displayed if the element or one of its descendants gain the focus?
 
