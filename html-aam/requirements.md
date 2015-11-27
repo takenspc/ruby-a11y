@@ -1,5 +1,11 @@
 # Requirements for reading ruby annotations
 
+## Summary
+
+W3C HTML has "a [ruby model] that matches both users' needs and implementations". However the ruby model is not easy to implement. The assistive technologies need to implement all of the model because browsers don't expose the ruby structure well in the current spec. This proposal aims to make the ruby model easier to implement by assistive technologies.
+
+   [ruby model]: http://www.w3.org/TR/html51/semantics.html#the-ruby-element
+
 ## Principal: supporting reading preferences
 
 - [Issue 427756 - chromium - Accessibility text-to-speech doesn't respect `<ruby>` element](https://code.google.com/p/chromium/issues/detail?id=427756)
@@ -17,30 +23,27 @@ Users should able to choose whther screen readers read ruby bases or ruby annota
 
 Assistive technologies may need to do following steps to read ruby bases and not to read ruby annotations:
 
-- base
-- annotation
-
 - For each child of ruby elements:
 	- if the child is either a phrasing content node or a rb element: process the child
 	- otherwise: skip the child
 
-### Complexity 1:
+### Complexity 1: Intermixing ruby bases and ruby texts
 
-The process can be complicated as ruby base and ruby texts can be intermixed. W3C HTML has following example:
+The process can be complicated as ruby bases and ruby texts can be intermixed. W3C HTML has following example:
 
 ```html
 <ruby lang="ja"><rb>日<rt>に</rt><rb>本<rt>ほん</rt><rb>語<rt>ご</rt></ruby>
 ```
 
-- 日本語
-- にほんご
+The ruby base of this example is "日本語" and ruby annotation is "にほんご". Please note that both "日本語" and "にほんご" is one word.
+
+RUBY-UC has similar example:
 
 ```html
 <ruby lang="ja">常用<rp>(</rp><rt>じょうよう<rp>)</rp>漢字<rp>(</rp><rt>かんじ<rp>)</rp>表<rp>(<rp><rt>ひょう</rt><rp>)</rp></ruby>
 ```
 
-- 常用漢字表
-- じょうようかんじひょう
+The ruby base of this example is "常用漢字表" and ruby annotation is "じょうようかんじひょう".
 
 DOM tree (and Accessibility Tree) of this will look like:
 
@@ -60,7 +63,7 @@ DOM tree (and Accessibility Tree) of this will look like:
 
 This can't be fixed.
 
-### Complexity 2:
+### Complexity 2: Implicit ruby bases
 
 The process can be more complicated as phrasing content nodes are allowed as ruby children and they treated as if ruby element is ommitted. Let's consider following example:
 
