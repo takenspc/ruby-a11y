@@ -65,7 +65,7 @@ This can't be fixed.
 
 ### Complexity 2: Implicit ruby bases
 
-The process can be more complicated as phrasing content nodes are allowed as ruby children and they treated as if ruby element is ommitted. Let's consider following example:
+The process can be more complicated as phrasing content nodes are allowed as children of `ruby` element and they treated as ruby bases as if `rb` element is ommitted. Let's consider following example:
 
 ```html
 <ruby>東<rb>京<rp>(<rt>とう<rt>きょう<rp>)</ruby>
