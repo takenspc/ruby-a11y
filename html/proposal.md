@@ -1,231 +1,247 @@
-# Requirements for reading ruby annotations
-
-## Summary
-
-W3C HTML has "a [ruby model] that matches both users' needs and implementations". However the ruby model is not easy to implement. The assistive technologies need to implement all of the model because browsers don't expose the ruby structure well in the current spec. This proposal aims to make the ruby model easier to implement by assistive technologies.
-
-   [ruby model]: http://www.w3.org/TR/html51/semantics.html#the-ruby-element
-
-## Principal: supporting reading preferences
-
-- [Issue 427756 - chromium - Accessibility text-to-speech doesn't respect `<ruby>` element](https://code.google.com/p/chromium/issues/detail?id=427756)
-
-Users should able to choose whther screen readers read ruby bases or ruby annotations (ruby texts).
-
-- Reading ruby without rtc elements
-- Reading ruby with rtc elements
-
-## Reading ruby without rtc elements
+# Proposals for the W3C HTML ruby model
 
 ```html
 <ruby><rb>base<rt>annotation</ruby>
 ```
 
-Assistive technologies may need to do following steps to read ruby bases and not to read ruby annotations:
+## Summary
 
-- For each child of ruby elements:
-	- if the child is either a phrasing content node or a rb element: process the child
-	- otherwise: skip the child
+W3C HTML has "a [ruby model] that matches both users' needs and implementations". However the ruby model is not easy to implement. Specifically, the assistive technologies need to re-implement all of the model because browsers don't expose the ruby structure in current spec. This proposal aims to make the ruby model easier to implement by assistive technologies.
 
-### Complexity 1: Intermixing ruby bases and ruby texts
+This proposal intends to
 
-The process can be complicated as ruby bases and ruby texts can be intermixed. W3C HTML has following example:
+- preseve the makrup of the current ruby model
+- change start and end tag of [`rb`] and [`rtc`] elements be omissible like [`tbody`]
+
+In other words, this proposal intends to make the every child of `ruby` element be either `rb`, `rtc` or `rp` element.
+
+   [ruby model]: http://www.w3.org/TR/html51/semantics.html#the-ruby-element
+   [`rb`]: http://www.w3.org/TR/html51/semantics.html#the-rb-element
+   [`rtc`]: http://www.w3.org/TR/html51/semantics.html#the-rtc-element
+   [`tbody`]: http://www.w3.org/TR/html51/semantics.html#the-tbody-element
+
+## Requirements: supporting reading preferences
+
+[Issue 427756 - chromium - Accessibility text-to-speech doesn't respect `<ruby>` element](https://code.google.com/p/chromium/issues/detail?id=427756)
+
+A user should be able to choose whether a screen reader read ruby bases or ruby annotations (ruby texts).
+
+To do that, screen readers need to distingush between the ruby bases and ruby annotations (ruby texts). The ruby bases are in the current ruby model. 
+
+This proposal discuss single-sided ruby model (ruby without `rtc` elements) followed by discussions of the double-sided ruby (ruby texts with `rtc` elements). Because double-sided ruby is much more complicated.
+
+## Single-sided ruby (ruby without `rtc` elements)
 
 ```html
-<ruby lang="ja"><rb>日<rt>に</rt><rb>本<rt>ほん</rt><rb>語<rt>ご</rt></ruby>
+<ruby><rb>base<rt>annotation</ruby>
 ```
 
-The ruby base of this example is "日本語" and ruby annotation is "にほんご". Please note that both "日本語" and "にほんご" is one word.
+Assistive technologies may need to do following steps to distingush between ruby bases and ruby annotations of single-sided ruby:
 
-RUBY-UC has similar example:
+- let `last is rb` be false
+- let `n` be 0
+- For each `child` of a `ruby` element:
+	- if the `child` is <mark>either a phrasing content node or a `rb` element</mark>:
+		- let `last is rb` is false
+			- increment `n`
+			- let `last is rb` is true
+		- the child is a part of ruby base of `n`-th ruby segment
+	- if the child is a `rt` element:
+		- let `last is rb` be false
+		- the child is a part of ruby annotation of `n`-th ruby segment
 
-```html
-<ruby lang="ja">常用<rp>(</rp><rt>じょうよう<rp>)</rp>漢字<rp>(</rp><rt>かんじ<rp>)</rp>表<rp>(<rp><rt>ひょう</rt><rp>)</rp></ruby>
-```
+### Complexity 1: Implicit ruby bases
 
-The ruby base of this example is "常用漢字表" and ruby annotation is "じょうようかんじひょう".
+The process can be complicated as phrasing content nodes are allowed as children of `ruby` element and they treated as ruby bases as if `rb` element is omitted. Let's consider following example:
 
-DOM tree (and Accessibility Tree) of this will look like:
-
-- ruby
-	- rb
-		- \#text (base)
-	- rt
-		- \#text (annotation)
-	- rb
-		- \#text (base)
-	- rt
-		- \#text (annotation)
-	- rb
-		- \#text (base)
-	- rt
-		- \#text (annotation)
-
-This can't be fixed.
-
-### Complexity 2: Implicit ruby bases
-
-The process can be more complicated as phrasing content nodes are allowed as children of `ruby` element and they treated as ruby bases as if `rb` element is ommitted. Let's consider following example:
+Example 1
 
 ```html
 <ruby>東<rb>京<rp>(<rt>とう<rt>きょう<rp>)</ruby>
 ```
 
-DOM tree (and Accessibility Tree) will look like:
+Note: The ruby base of Example 1 is "東京" and ruby annotation is "とうきょう".
+
+The DOM tree (and Accessibility Tree) of Examle 1 will look like:
 
 - ruby
-	- \#text (base)
+	- \#text (東)
 	- rb
-		- \#text (base)
+		- \#text (京)
 	- rt
-		- \#text (annotation)
+		- \#text (とう)
 	- rt
-		- \#text (annotation)
+		- \#text (きょう)
+
+This means that screen readers need to handle first text node as a part of ruby base as described in [W3C HTML ruby model] while browsers already handled the ruby element for rendering.
+
+   [W3C HTML ruby model]: http://www.w3.org/TR/html51/semantics.html#segmentation-and-categorisation-of-ruby
+
+Consider more complicated example:
+
+Example 2
 
 ```html
-<ruby lang="ja"><time datetime="05-05">端午</time><mark>節句</mark><rp>（<rt>たんごのせっく<rp>）</ruby>
+<ruby><time datetime="05-05">端午</time><mark>節句</mark><rp>（<rt>たんごのせっく<rp>）</ruby>
 ```
+
+Note: The ruby base of Example 2 is "端午節句" and the ruby annotation is "たんごのせっく".
 
 Note: "節句" means "seasonal celebration"
 
-DOM tree (and Accessibility Tree) will look like:
+DOM tree (and Accessibility Tree) of Example 2 will look like:
 
 - ruby
 	- time
-		- \#text (base)
+		- \#text (端午)
 	- mark
-		- \#text (base)
+		- \#text (節句)
 	- rp
 		- \#text
 	- rt
-		- \#text (annotation)
+		- \#text (たんごのせっく)
 	- rp
 		- \#text
 
-Assistive technologies need to process any contents other than rp or rt elements.
+Assistive technologies need to process any contents other than `rp` or `rt` elements.
 
-### Simplification 2
+Note: According to the current HTML AAM specification, [`time`] and [`mark`] elements construct accessible objects.
 
+   [`time`]: TODO
+   [`mark`]: TODO
 
-Above process can be simplified if rb element is implicitly constructed like tbody element.
+### Proposal 1: make start and end tag of `rb` be omissible
+
+Above complexity can be reduced if `rb` element is implicitly constructed like `tbody` element. In other words, if start and end tag of `rb` can be omitted.
+
+Example 1:
 
 ```html
 <ruby>東<rb>京<rp>(<rt>とう<rt>きょう<rp>)</ruby>
 ```
+
+will be treated as
+
+Example 1a:
 
 ```html
 <ruby><rb>東<rb>京<rp>(<rt>とう<rt>きょう<rp>)</ruby>
 ```
 
-DOM tree (and Accessibility Tree) will look like:
+DOM tree (and Accessibility Tree) of Example 1 and Example 1a will look like:
 
 - ruby
 	- rb
-		- \#text (base)
+		- \#text (東)
 	- rb
-		- \#text (base)
+		- \#text (京)
 	- rp
 		- \#text
 	- rt
-		- \#text (annotation)
+		- \#text (とう)
 	- rt
-		- \#text (annotation)
+		- \#text (きょう)
 	- rp
 		- \#text
 
+Example 2:
 
 ```html
 <ruby lang="ja"><time datetime="05-05">端午</time><mark>節句</mark><rp>（<rt>たんごのせっく<rp>）</ruby>
 ```
 
+will be treated as
+
+Example 2a:
 
 ```html
 <ruby lang="ja"><rb><time datetime="05-05">端午</time><mark>節句</mark><rp>（<rt>たんごのせっく<rp>）</ruby>
 ```
 
-DOM tree (and Accessibility Tree) will look like:
+DOM tree (and Accessibility Tree) of Example 2 and Example 2a will look like:
 
 - ruby
 	- rb
 		- time
-			- \#text (base)
+			- \#text (端午)
 		- mark
-			- \#text (base)
+			- \#text (節句)
 	- rp
 		- \#text
 	- rt
-		- \#text (annotation)
+		- \#text (たんごのせっく)
 	- rp
 		- \#text
-
-Genralized form is followings
-
-- ruby
-	- one or more rb elements
-	- zero or more rp elements
-	- one or more rt elements
-	- zero or more rp elements
-	- one or more rb elements
-	- zero or more rp elements
-	- one or more rt elements
-	- zero or more rp elements
 
 The required process of assistive technologies will be simplified as follows:
 
-To read the ruby bases:
+- let `last is rb` be false
+- let `n` be 0
+- For each `child` of a `ruby` element:
+	- if the `child` is <mark>a `rb` element</mark>:
+		- let `last is rb` is false
+			- increment `n`
+			- let `last is rb` is true
+		- the child is a part of ruby base of `n`-th ruby segment
+	- if the child is a `rt` element:
+		- let `last is rb` be false
+		- the child is a part of ruby annotation of `n`-th ruby segment
 
-- For each child of ruby elements:
-	- if the child is a rb element: process the child
-	- otherwise: skip the child
 
-To read the ruby annnotations:
+## Double-sided ruby (ruby with `rtc` elements)
 
-- For each child of ruby elements:
-	- if the child is rt element: process the child
-	- otherwise: skip the child
+TODO: Is `rtc` element really needed? It seems too complicated.
 
+Using `rtc` element, authors can annotate a base twice. For example:
 
-## Reading ruby with rtc elements
-
-TODO: Is rtc element really needed? It seems too complicated.
-
-Using rtc element, authors can annotate a base twice.
-
-For example:
-
-```html
-<ruby lang="ja"><rb>東南</rb><rp>（</rp><rtc><rt>とうなん</rt></rtc><rp>、</rp><rtc><rt>たつみ</rt></rtc><rp>）</rp></ruby>
-```
-
-- ruby
-	- rb
-	- rtc
-		- rt
-	- rtc
-		- rt
-
-- ruby base is "東南"
-- 1st ruby annotation is "とうなん"
-- 2nd ruby annotation is "たつみ"
-
-Reading both 1st and 2nd annotations usually doesn't make sense. Japanese speakers usually don't pronounce "東南" as "とうなんたつみ". They usually choose either "とうなん" or "たつみ".
-
-Users may want to know all of the ruby annotations especially in the education. In that cases users shoud know boundary of each ruby anotations cluster. In other words, users should know the position or index of ruby annotations cluster.
-
-- For each child of ruby elements:
-	- if the child is contained by n-th (anonymous) ruby text container: process the child
-	- otherwise: skip the child
-
-However determining whether an element is contained by n-th (anonymous) ruby text container is complicated.
-
-### Complexity 3
-
-The rtc element can be ommited entirely.
-
+Example 3:
 
 ```html
-<ruby lang="ja"><rb>東南</rb><rp>（</rp><rt>とうなん</rt><rp>、</rp><rtc><rt>たつみ</rt></rtc><rp>）</rp></ruby>
+<ruby><rb>東南<rp>（</rp><rtc><rt>とうなん</rt></rtc><rp>、</rp><rtc><rt>たつみ</rt></rtc><rp>）</rp></ruby>
 ```
+
+In this example, the ruby base is "東南", the first ruby annotation is "とうなん" and the second ruby annotation is "たつみ".
+
+Reading both first and second annotations usually doesn't make sense. Japanese speakers usually don't pronounce "東南" as "とうなんたつみ". They usually pronounce either "とうなん" or "たつみ".
+
+Thus that screen readers need to distingush each ruby annnotation container. To do that screen readers need to determine:
+
+- how many ruby text annoations are there
+- which ruby annotation segment is belong to which ruby text container
+
+So that assistive technologies may need to do following steps:
+
+- let `last is rb` be false
+- let `n` be 0
+- let `m` be 0
+- For each child of a `ruby` element:
+	- if the child is a `rb` element:
+		- if `last is rb` is false
+			- increment `n`
+			- let `last is rb` be true
+		- the child is a part of ruby base of `n`-th ruby segment
+	- if the child is is <mark>contained by n-th (anonymous) ruby text container</mark>:
+		- if `last is rb` is true:
+			- let `m` be 0
+			- let `last is rb` be false
+		- increment `m`
+		- the child is `m`-th ruby annotation contaienr of `n`-th ruby segment
+
+I know the sentence "the child is is contained by n-th (anonymous) ruby text container" is tautological. However determining whether an element is contained by n-th (anonymous) ruby text container is actually complicated.
+
+### Complexity 2: Implicit ruby text containers
+
+In the current W3C HTML ruby model, the `rtc` element can be entirely omited.
+
+Example 3 can be written as follows:
+
+Example 3a
+
+```html
+<ruby><rb>東南</rb><rp>（</rp><rt>とうなん</rt><rp>、</rp><rtc><rt>たつみ</rt></rtc><rp>）</rp></ruby>
+```
+
+The DOM tree (and Accessibility Tree) of Examle 3a will look like:
 
 - ruby
 	- rb
@@ -233,46 +249,45 @@ The rtc element can be ommited entirely.
 	- rtc
 		- rt
 
-How to divid ruby annnotations to ruby annotation container is described in W3C HTML.
+How to divide ruby annotations to ruby annotation container is described in W3C HTML. And assistive Technologies need to implement that algorithm while browers already do that algorithm for rendering.
 
-Assistive Technologies need to implement that algorithm.
+Even worse, the algorithm can be more complicated than Example 3a. For example, each (anonymous) ruby text container can have different number of rt elements.
 
-The algorithm is complicated.
-
-For example, each (anonymous) ruby text container can have different number of rt elements.
+Example 4
 
 ```html
 <ruby><rb>旧<rb>金<rb>山<rt>jiù<rt>jīn<rt>shān<rtc>San Francisco</ruby>
 ```
 
-- ruby
-	- rb
-	- rb
-	- rb
-	- rt
-	- rt
-	- rt
-	- rtc
+Note: The ruby base is "旧金山", the first ruby annotation is "jiùjīnshān", the second ruby annotaion is "San Francisco".
 
-Assistive Technologies treat that as if
+The DOM tree (and Accessibility Tree) of Example 4 will look like:
 
 - ruby
-	- rb
-	- rb
-	- rb
+	- rb (旧)
+	- rb (金)
+	- rb (山)
+	- rt (jiù)
+	- rt (jīn)
+	- rt (shān)
+	- rtc (San Francisco)
+
+The assistive technologies need to treat Example 4 as if
+
+- ruby
+	- rb (旧)
+	- rb (金)
+	- rb (山)
 	- rtc
-		- rt
-		- rt
-		- rt
+		- rt (jiù)
+		- rt (jīn)
+		- rt (shān)
 	- rtc
+		- rt (San Francisco)
 
+Additionaly, one `ruby` element can have multiple pairs of ruby bases and ruby containers
 
-- 旧金山
-- jiùjīnshān
-- San Francisco
-
-
-Additionaly, one ruby element can have multiple pairs of ruby bases and ruby containers
+Example 5
 
 ```html
 <ruby>
@@ -282,39 +297,52 @@ Additionaly, one ruby element can have multiple pairs of ruby bases and ruby con
 </ruby>
 ```
 
-- ruby
-	- \#text
-	- rt
-	- rtc
-	- \#text
-	- rt
-	- rtc
-	- \#text
-	- rt
-	- rtc
+In this example, there are 3 ruby segements.
 
-Assistive Technologies treat that as if
+- first segment: the ruby base is "♥", the first ruby annnotation is "Heart", and the second ruby annotation is "Cœur"
+- second segment: the ruby base is "☘", the first ruby annnotation is "Shamrock", and the second ruby annotation is "Trèfle"
+- third segment: the ruby base is "✶", the first ruby annnotation is "Star", and the second ruby annotation is "Étoile"
+
+The DOM tree (and Accessibility Tree) of Example 5 will look like:
 
 - ruby
-	- rb
+	- \#text (♥)
+	- rt (Heart)
+	- rtc (Cœur)
+	- \#text (☘)
+	- rt (Shamrock)
+	- rtc (Trèfle)
+	- \#text (✶)
+	- rt (Star)
+	- rtc (Étoile)
+
+The assistive technologies need to treat that as if
+
+- ruby
+	- rb (♥)
 	- rtc
-		- rt
-	- rb
+		- rt (Heart)
 	- rtc
-		- rt
-	- rb
+		- rt (Cœur)
+	- rb (☘)
 	- rtc
-		- rt
+		- rt (Shamrock)
+	- rtc
+		- rt (Trèfle)
+	- rb (✶)
+	- rtc
+		- rt (Star)
+	- rtc
+		- rt (Étoile)
+
+This is too much requirements for assistive technologies.
 
 
-- ♥ ☘ ✶
-- Hear Shamrock Start
-- Cœur Trèfle Étoile
+### Proposal 2: make start and end tag of `rtc` be omissible
 
+Above complexity can be reduced if `rtc` element is implicitly constructed like `tbody` element. In other words, if start and end tag of `rtc` can be omitted.
 
-### Simplification 2
-
-Above process can be simplified if a rtc element are implicitly constructed like tbody element.
+If so Example 4
 
 ```html
 <ruby>
@@ -324,68 +352,41 @@ Above process can be simplified if a rtc element are implicitly constructed like
 </ruby>
 ```
 
-- ruby
-	- rb
-	- rtc
-		- rt
-	- rtc
-
-	- rb
-	- rtc
-		- rt
-	- rtc
-
-	- rb
-	- rtc
-		- rt
-	- rtc
-
-
-```html
-<ruby><rb>旧<rb>金<rb>山<rt>jiù<rt>jīn<rt>shān<rtc>San Francisco</ruby>
-```
-
-```html
-<ruby><rb>旧<rb>金<rb>山<rtc><rt>jiù<rt>jīn<rt>shān</rtc><rtc><rt>San Francisco</rt></rtc></ruby>
-```
+constructs the DOM tree (and Accessibility Tree) look like:
 
 - ruby
-	- rb
-	- rb
+	- rb (♥)
+	- rtc
+		- rt
+	- rtc
+		- rt
+	- rb (☘)
+	- rtc
+		- rt
+	- rtc
+		- rt
 	- rb
 	- rtc
 		- rt
+	- rtc
 		- rt
-		- rt
-	- rtc
 
-Generalized form is:
+This is much cleaner tree.
 
-- ruby
-	- one or more rb element(s)
-	- rtc
-		- one or more phrasing content nodes or rt elements
-	- rtc
-		- one or more phrasing content nodes or rt elements
-	- one or more rb element(s)
-	- rtc
-		- one or more phrasing content nodes or rt elements
-	- rtc
-		- one or more phrasing content nodes or rt elements
+So that assistive technologies may need to do following steps:
 
-To read ruby bases:
-
-- For each child of ruby elements:
-	- if the child is a rb element: process the child
-	- otherwise: skip the child
-
-To read n-th ruby annotation:
-
-- let index is 0
-- For each child of ruby elements:
-	- if the child is a rb element: let index is 0
-	- if the child is a rtc element:
-		- incrment index
-		- if index equals to n: process the child
-		- otherwise: skip the child
-	- otherwise: skip the child
+- let `last is rb` be false
+- let `n` be 0
+- let `m` be 0
+- For each child of a `ruby` element:
+	- if the child is a `rb` element:
+		- if `last is rb` is false
+			- increment `n`
+			- let `last is rb` be true
+		- the child is a part of ruby base of `n`-th ruby segment
+	- if the child is <mark>a `rtc` element</mark>:
+		- if `last is rb` is true:
+			- let `m` be 0
+			- let `last is rb` be false
+		- increment `m`
+		- the child is `m`-th ruby annotation contaienr of `n`-th ruby segment
