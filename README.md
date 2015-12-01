@@ -1,8 +1,12 @@
 # Misc. Thoughts on Ruby
 
-## Accessibility API Mapping
+## HTML
 
-- [Requirements](html-aam/requirements.md)
+- [Proposal](html/proposal.md)
+
+## HTML Accessibility API Mapping
+
+TODO
 
 ## Auto hiding ruby annotation
 
