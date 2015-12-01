@@ -6,14 +6,14 @@
 
 ## Summary
 
-W3C HTML has "a [ruby model] that matches both users' needs and implementations". However the ruby model is not easy to implement. Specifically, the assistive technologies need to re-implement all of the model because browsers don't expose the ruby structure in current spec. This proposal aims to make the ruby model easier to implement by assistive technologies.
+W3C HTML has "a [ruby model] that matches both users' needs and implementations". However the current ruby model is not easy to implement. Specifically, the assistive technologies need to implement all of the ruby model because browsers don't expose the ruby structure to ATs in the current ruby model. This proposal aims to make the ruby model easier to implement by assistive technologies.
 
 This proposal intends to
 
 - preseve the makrup of the current ruby model
 - change start and end tag of [`rb`] and [`rtc`] elements be omissible like [`tbody`]
 
-In other words, this proposal intends to make the every child of `ruby` element be either `rb`, `rtc` or `rp` element.
+In other words, this proposal intends to make the every DOM child of `ruby` element be either `rb`, `rtc` or `rp` element.
 
    [ruby model]: http://www.w3.org/TR/html51/semantics.html#the-ruby-element
    [`rb`]: http://www.w3.org/TR/html51/semantics.html#the-rb-element
@@ -26,7 +26,7 @@ In other words, this proposal intends to make the every child of `ruby` element 
 
 A user should be able to choose whether a screen reader read ruby bases or ruby annotations (ruby texts).
 
-To do that, screen readers need to distingush between the ruby bases and ruby annotations (ruby texts). The ruby bases are in the current ruby model. 
+To do that, screen readers need to distingush between the ruby bases and ruby annotations.
 
 This proposal discuss single-sided ruby model (ruby without `rtc` elements) followed by discussions of the double-sided ruby (ruby texts with `rtc` elements). Because double-sided ruby is much more complicated.
 
